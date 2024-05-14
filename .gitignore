@@ -1,7 +1,21 @@
-*.weights
-*.cfg
-*.txt
+# Ignore model files
+*.pb
+
+# Ignore input and output videos
+*.mp4
+
+# Ignore Python bytecode files
+__pycache__/
+*.py[cod]
+
+# Ignore virtual environment directories
+venv/
+myenv/
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore log files and temp files
 *.log
-input/*
-output/*
-myenv/*
+*.tmp
