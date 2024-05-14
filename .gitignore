@@ -1,0 +1,7 @@
+*.weights
+*.cfg
+*.txt
+*.log
+input/*
+output/*
+myenv/*
