@@ -11,7 +11,7 @@ class MainPresenter:
         self.input_video_path = ""
 
     def select_file(self):
-        file_path = filedialog.askopenfilename(filetypes=[("All files", "*.*"), ("MP4 files", "*.mp4"), ("AVI files", "*.avi"), ("MOV files", "*.mov")])
+        file_path = filedialog.askopenfilename(filetypes=[("MP4 files", "*.mp4"), ("AVI files", "*.avi"), ("MOV files", "*.mov")])
         if file_path:
             self.input_video_path = file_path
             self.view.show_video(file_path)
