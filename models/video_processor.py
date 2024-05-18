@@ -1,40 +1,42 @@
 import cv2
+from models.frame_item import FrameItem
+import threading
+import torch
 
 class VideoProcessor:
-    def __init__(self, yolo_model):
+    def __init__(self, yolo_model, view):
         self.yolo_model = yolo_model
+        self.view = view
 
-    def crop_video(self, input_path, output_path):
-        cap = cv2.VideoCapture(input_path)
+    def extract_frames(self, video_path):
+        cap = cv2.VideoCapture(video_path)
         if not cap.isOpened():
-            print("Error: Could not open input video.")
-            return
-        
-        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+            print("Error: Could not open video.")
+            return []
+
         height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        fps = cap.get(cv2.CAP_PROP_FPS)
-        video_height = height
-        target_width = int(video_height * (9 / 16))
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        out = cv2.VideoWriter(output_path, fourcc, fps, (target_width, video_height))
+        target_width = int(height * (9 / 16))
 
-        if not out.isOpened():
-            print("Error: Could not open output video for writing.")
-            return
+        frames = []
+        index = 0
 
-        while True:
+        while cap.isOpened():
             ret, frame = cap.read()
             if not ret:
                 break
-
-            boxes = self.yolo_model.detect_objects(frame)
-            center_x = width // 2
-            x_min = max(0, center_x - target_width // 2)
-            x_max = min(width, center_x + target_width // 2)
-            cropped_frame = frame[:, x_min:x_max]
-            cropped_frame_resized = cv2.resize(cropped_frame, (target_width, video_height))
-            out.write(cropped_frame_resized)
+             # Chuyển frame sang GPU
+            # frame_tensor = torch.tensor(frame).to(self.yolo_model.device)
+            # boxes, centers = self.yolo_model.detect_objects(frame_tensor)
+            # center_x = frame.shape[1] // 2
+            frame_item = FrameItem(index, 0, frame)
+            frames.append(frame_item)
+            index += 1
 
         cap.release()
-        out.release()
-        print("Video cropping process completed!")
+        return frames
+    
+
+    def display_frames_in_timeline(self, frame_items):
+        if frame_items:
+            self.view.display_frames_in_timeline(frame_items)
+
