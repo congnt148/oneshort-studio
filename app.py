@@ -1,10 +1,11 @@
-# app.py
 from flask import Flask, request, url_for, send_file, jsonify
+from flask_cors import CORS
 import os
 from datetime import datetime
 from services.scene_detect import detect_scenes_pyscenedetect
 
 app = Flask(__name__)
+CORS(app, resources={r"/crop_video": {"origins": "http://localhost:3001"}}) 
 
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -34,12 +35,18 @@ def crop_video_api():
     try:
         detect_scenes_pyscenedetect(input_video_path, output_video_path)
     except Exception as e:
-        return jsonify(error=str(e)), 500
+        return jsonify(status=False, error=str(e)), 500
     
     video_final_url = url_for('uploaded_file', filename=output_filename, _external=True)
     video_raw_url = url_for('uploaded_file', filename=filename, _external=True)
     
-    return jsonify(video_final_url=video_final_url, video_raw_url=video_raw_url)
+    return jsonify(
+        status=True, 
+        data={
+            'videoFinalUrl': video_final_url, 
+            'videoRawUrl': video_raw_url
+        }
+    )
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):

@@ -110,13 +110,11 @@ def write_video(frames, output_video, fps):
 def crop_video_to_center(subclip, fps):
     center_x_values = []
     duration = subclip.duration
-    
     for t in np.arange(0, duration, 1):
         frame = subclip.get_frame(t)
         center_x = compute_scene_center_x(frame)
         center_x_values.append(center_x)
         
-    
     smoothed_center_x_values = smooth_center_x_values(center_x_values)    
     
     total_frames = int(duration * fps)
@@ -181,17 +179,18 @@ def detect_scenes_pyscenedetect(video_path, output_path):
     scene_list = scene_manager.get_scene_list()
     all_frames = []
     
-    for i, (start_frame, end_frame) in enumerate(scene_list):
-        subclip = video_clip.subclip(start_frame.get_seconds(), end_frame.get_seconds())
-        frames = crop_video_to_center(subclip, fps)
+    if not scene_list:
+        frames = crop_video_to_center(video_clip, fps)
         all_frames.extend(frames)
+    else:
+        for i, (start_frame, end_frame) in enumerate(scene_list):
+            subclip = video_clip.subclip(start_frame.get_seconds(), end_frame.get_seconds())
+            frames = crop_video_to_center(subclip, fps)
+            all_frames.extend(frames)
         
     temp_video_path = 'temp_video.mp4'
     write_video(all_frames, temp_video_path, fps)
     video_clip.close()
-    temp_video_path = 'temp_video.mp4'
-    write_video(all_frames, temp_video_path, fps)
-    
     add_audio_to_video(temp_video_path, video_path, output_path)
     
     os.remove(temp_video_path)
