@@ -53,16 +53,21 @@ def translate_srt_file(input_srt_path, output_srt_path, target_language='en'):
 
 def create_srt_file(transcript, srt_file_path):
     subs = []
-    audio = AudioSegment.from_wav('audio.wav')
     words = transcript.results[0].alternatives[0].words
     word_count = len(words)
-    word_duration = audio.duration_seconds / word_count
-    for i, word in enumerate(words):
-        start_time_seconds = i * word_duration
-        end_time_seconds = (i + 1) * word_duration
-        start_time = timedelta(seconds=start_time_seconds)
-        end_time = timedelta(seconds=end_time_seconds)
-        subs.append(srt.Subtitle(i, start_time, end_time, word.word))
+    words_per_subtitle = 5
+
+    for i in range(0, word_count, words_per_subtitle):
+        subtitle_text = ' '.join(word.word for word in words[i:i + words_per_subtitle])
+        
+        start_time = words[i].start_time
+        end_time = words[min(i + words_per_subtitle - 1, word_count - 1)].end_time
+        
+        start_time_seconds = start_time.total_seconds()
+        end_time_seconds = end_time.total_seconds()
+        
+        subs.append(srt.Subtitle(index=len(subs) + 1, start=timedelta(seconds=start_time_seconds), end=timedelta(seconds=end_time_seconds), content=subtitle_text))
+
     with open(srt_file_path, "w", encoding="utf-8") as srt_file:
         srt_file.write(srt.compose(subs))
 
