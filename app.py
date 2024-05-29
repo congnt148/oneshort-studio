@@ -1,6 +1,7 @@
 # app.py
 from flask import Flask, request, url_for, send_file, jsonify
 import os
+from werkzeug.utils import secure_filename
 from datetime import datetime
 from services.scene_detect import detect_scenes_pyscenedetect
 
@@ -28,6 +29,8 @@ def crop_video_api():
     video.save(input_video_path)
 
     
+    filename = secure_filename(video.filename)
+
     output_filename = f"cropped_{timestamp}.mp4"
     output_video_path = os.path.join(app.config['UPLOAD_FOLDER'], output_filename)
     
@@ -40,7 +43,7 @@ def crop_video_api():
     video_raw_url = url_for('uploaded_file', filename=filename, _external=True)
     
     return jsonify(video_final_url=video_final_url, video_raw_url=video_raw_url)
-
+    
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_file(os.path.join(app.config['UPLOAD_FOLDER'], filename), as_attachment=True)
