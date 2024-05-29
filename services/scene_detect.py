@@ -2,7 +2,7 @@ from datetime import datetime
 import os
 import numpy as np
 from moviepy.video.io.VideoFileClip import VideoFileClip
-
+from flask import Flask, url_for
 from scenedetect import VideoManager, SceneManager
 from scenedetect.detectors import ContentDetector
 from moviepy.editor import AudioFileClip
@@ -12,6 +12,7 @@ from ultralytics import YOLO
 from scipy.optimize import curve_fit
 import cv2
 
+app = Flask(__name__)
 model = YOLO('yolov8s.pt')
 
 def load_object_weights(file_path):
@@ -60,6 +61,10 @@ def poly_fit(x, a, b, c):
     return a * x ** 2 + b * x + c
 
 def smooth_center_x_values(center_x_values):
+    
+    if len(center_x_values) < 3:
+        return center_x_values 
+    
     x = np.arange(len(center_x_values))
     y = np.array(center_x_values)
     popt, _ = curve_fit(poly_fit, x, y)
@@ -107,8 +112,9 @@ def write_video(frames, output_video, fps):
         
     out.release()
     
-def crop_video_to_center(subclip, fps):
+def crop_video_to_center(subclip, fps, image_folder, project_id):
     center_x_values = []
+    image_urls = []
     duration = subclip.duration
     
     for t in np.arange(0, duration, 1):
@@ -116,8 +122,16 @@ def crop_video_to_center(subclip, fps):
         center_x = compute_scene_center_x(frame)
         center_x_values.append(center_x)
         
-    
-    smoothed_center_x_values = smooth_center_x_values(center_x_values)    
+        # image_filename = f"frame_{project_id}_{int(t)}.jpg"
+        # image_path = os.path.join(image_folder, image_filename)
+        # cv2.imwrite(image_path, frame)
+        # image_url = url_for('uploaded_image', timestamp=project_id, filename=image_filename, _external=True)
+        # image_urls.append(image_url)
+        
+    if len(center_x_values) >= 3:
+        smoothed_center_x_values = smooth_center_x_values(center_x_values)
+    else:
+        smoothed_center_x_values = center_x_values
     
     total_frames = int(duration * fps)
     all_center_x_values = np.interp(
@@ -126,8 +140,7 @@ def crop_video_to_center(subclip, fps):
         smoothed_center_x_values
     )
     
-    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-    temp_video_path = f"temp_video_{timestamp}.mp4"
+    temp_video_path = f"temp_video_{project_id}.mp4"
     subclip.write_videofile(temp_video_path, fps=fps)
     
     cap = cv2.VideoCapture(temp_video_path)
@@ -157,6 +170,7 @@ def crop_video_to_center(subclip, fps):
     
     cap.release()
     os.remove(temp_video_path)
+    # return frames, image_urls
     return frames
 
 def add_audio_to_video(video_path, audio_path, output_path):
@@ -165,7 +179,7 @@ def add_audio_to_video(video_path, audio_path, output_path):
     final_video = video.set_audio(audio)
     final_video.write_videofile(output_path, codec='libx264', audio_codec='aac')
 
-def detect_scenes_pyscenedetect(video_path, output_path):
+def detect_scenes_pyscenedetect(video_path, output_path, image_folder, project_id):
     video_clip = VideoFileClip(video_path)
 
     audio = video_clip.audio
@@ -180,18 +194,22 @@ def detect_scenes_pyscenedetect(video_path, output_path):
     
     scene_list = scene_manager.get_scene_list()
     all_frames = []
+    # image_urls = []
     
-    for i, (start_frame, end_frame) in enumerate(scene_list):
-        subclip = video_clip.subclip(start_frame.get_seconds(), end_frame.get_seconds())
-        frames = crop_video_to_center(subclip, fps)
+    if not scene_list:
+        frames = crop_video_to_center(video_clip, fps, image_folder, project_id)
         all_frames.extend(frames)
+        # image_urls.extend(urls)
+    else:
+        for i, (start_frame, end_frame) in enumerate(scene_list):
+            subclip = video_clip.subclip(start_frame.get_seconds(), end_frame.get_seconds())
+            frames = crop_video_to_center(subclip, fps, image_folder, project_id)
+            all_frames.extend(frames)
+            # image_urls.extend(urls)
         
     temp_video_path = 'temp_video.mp4'
     write_video(all_frames, temp_video_path, fps)
     video_clip.close()
-    temp_video_path = 'temp_video.mp4'
-    write_video(all_frames, temp_video_path, fps)
-    
     add_audio_to_video(temp_video_path, video_path, output_path)
     
     os.remove(temp_video_path)
