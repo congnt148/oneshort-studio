@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "intrepid-pager-295204",
+  "private_key_id": "b37b78b2f539f4c5eb7773473e841c9c90d5935b",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDM4PKnI8DY1z2d\nuR3aV1r91P5QJKGFLiEPOEOl9lEWhnGSi+9Vj25jf+ypuw94c9LBT/w2hJbIFhwP\nlL5AYGp5V4QD8L8GuH+3KHk8vnxQvX0u+oiMOmEVEAn0eBTfw9q5w52A/6B4NlO9\nSkXj8pg+JpWsoP2NDEnVfXodMBhTUfvRmb4HVD09+qTA+4EG28ywnV8snQHRRoUQ\nWBeilp6/4wT/g36RPR/H5xsSfbpZnNzzxEY7bpY2Crd1uJBIIhiy3XIDuz5uXW4H\nzK/iy5wLWSlMCvSe980OR6qErYaF3o/SNyF5sjSk0srRh8HmhlAEAXnm7+0YGsSV\nggemQ425AgMBAAECgf9dM0KNGmDHGDX9e/izJzjbEOjLahz3H93tRSmNdrzNVSaK\nQ+LcVb9gQogdPeDHGA7V96qNvo4j/Z/onBRaPiRv+Nsv1rpH31IUna3N+PiwkCUo\nom8ICmEvK+kpdzI5sdQOX3yAwF63roh5JOsHHP719cZV+DF4pd5tgy8CFQLWZriw\nxfYGMZa2P8ofiV2bGEeyoUoiHlo1pUy80zsbNWrid3lE2dHFTiGy7NL16vp4ddi+\nPtRcXWtop4N7va30XxFt5MgjeBp6jhCr+r9A3zsRztGgCOs6MRvcEJxgqMk1f5bU\nt3tIsqyci814fAEQMy7rbG932iZlaqWpKbYv6a0CgYEA9Ea4URvzToOAbtq/81ae\n/mv4u3HmugBcjYbebL4dvY1UgydS6L+VjapVufRUkrA1rtLcWyjlOBQTEn1dJaup\nFo8rMdm2EbXsSLxpYOf7admwYB4ouCl8vrPS1LhbjGo0p8G8XmdgIBm9tCkesZAH\ntmGVuCACgbXnAi01sdxcodUCgYEA1rYsU/28onr6Uj9gBecXrFfY7c9XZkI79u+K\nAlQ+5VyvTzyARyOj2Dw+xkldmquyG34B9obscv2TBKAi7FHBTJEg/5Sh3q1e6fQE\nd4zywlwy2Xb2H+U5+ozLb2zoVI1EIepNmeFIj73JiDtlYSpc3sbYdYTwKYVVslch\nQQixilUCgYAcGK5GlgJsO2/gUETXxlTPSrf3R2iUaEo89RBMTam6DbF0zGca4j5f\nZwIpO1Mm9CGYlCRIT/Hde2GeNNEr7gyqzZjYSQRKETS2QQWV4djnGeTRiWaBmDQC\n80gCs5nEEssvqHb0HMvPpWZOfJRNNBXPAnZoETZ4mOWTOIP+iywUaQKBgQCBDxWM\nEuus+qC2iXONeL/JDzDMmSHezJdAsfFRvxPjSBf0V9h/alPU6TmOdJD4JJY1YkOJ\nzMYZxIP3ds4nIGlBPccI+W1m7O0tUUjSF33gCA1km9YLi/yStsidnGf2UseOX0jv\n4vN7u0eFRLaGdjFGk12PHi5Btuyw+yB49+HH1QKBgQDMVD3t2hguMmqXCo96u52j\nF+++MZPIGjn5Yr8IB5XoV6wZiDUHlJO1T4rUVxl/1EpVYdKStwExzNGiY6nxp4QT\nsojiIQ0b77Zbnry73xxevKI5lBw8+m/c98GOUFQ6ZAVYLdY3yXoyOHqyOZdBlI4Q\ndvEYf5PomoQLmfHLcWbXig==\n-----END PRIVATE KEY-----\n",
+  "client_email": "python-ai-gen@intrepid-pager-295204.iam.gserviceaccount.com",
+  "client_id": "102671397854599534349",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/python-ai-gen%40intrepid-pager-295204.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
