@@ -1,4 +1,3 @@
-from flask import Flask
 from pydub import AudioSegment
 from google.cloud import speech_v1p1beta1 as speech
 from moviepy.editor import VideoFileClip
@@ -7,10 +6,7 @@ import srt
 import os
 from datetime import timedelta
 from googletrans import Translator
-
-app = Flask(__name__)
-SUBTITLE_FOLDER = 'subtitles'
-app.config['SUBTITLE_FOLDER'] = SUBTITLE_FOLDER
+from flask import url_for
 
 def convert_to_mono(audio_path):
     sound = AudioSegment.from_wav(audio_path)
@@ -39,6 +35,15 @@ def translate_srt_file(input_srt_path, output_srt_path, target_language='en'):
         sub.text = translated_text
 
     subs.save(output_srt_path)
+    
+def convert_srt_to_webvtt(srt_file_path, webvtt_file_path):
+    with open(srt_file_path, 'r', encoding='utf-8') as srt_file:
+        srt_content = srt_file.readlines()
+    
+    with open(webvtt_file_path, 'w', encoding='utf-8') as webvtt_file:
+        webvtt_file.write("WEBVTT\n\n")
+        for line in srt_content:
+            webvtt_file.write(line.replace(',', '.'))
 
 def create_srt_file(transcript, srt_file_path):
     subs = []
@@ -60,7 +65,7 @@ def create_srt_file(transcript, srt_file_path):
     with open(srt_file_path, "w", encoding="utf-8") as srt_file:
         srt_file.write(srt.compose(subs))
 
-def get_subtitle(input_video_path, project_id):
+def get_subtitle(input_video_path, project_id, subtitle_folder):
     
     audio_path = f"{project_id}.wav"
     video_clip = VideoFileClip(input_video_path)
@@ -72,12 +77,32 @@ def get_subtitle(input_video_path, project_id):
     
     transcript = transcribe_audio(audio_path)
     
-    srt_vi_path = os.path.join(app.config['SUBTITLE_FOLDER'], f"{project_id}_subtitles_vi.srt")
-    srt_en_path = os.path.join(app.config['SUBTITLE_FOLDER'], f"{project_id}_subtitles_en.srt")
+    srt_vi_path = os.path.join(subtitle_folder, f"{project_id}_subtitles_vi.srt")
+    srt_en_path = os.path.join(subtitle_folder, f"{project_id}_subtitles_en.srt")
 
     create_srt_file(transcript, srt_vi_path)
     translate_srt_file(srt_vi_path, srt_en_path)
     os.remove(audio_path)
     
-    return [srt_vi_path, srt_en_path]
+    webvtt_vi_path = os.path.join(subtitle_folder, f"{project_id}_subtitles_vi.vtt")
+    webvtt_en_path = os.path.join(subtitle_folder, f"{project_id}_subtitles_en.vtt")
+
+    convert_srt_to_webvtt(srt_vi_path, webvtt_vi_path)
+    convert_srt_to_webvtt(srt_en_path, webvtt_en_path)
+    
+    srt_vi_final = url_for('subtitles_file', filename=os.path.basename(srt_vi_path), _external=True)
+    srt_en_final = url_for('subtitles_file', filename=os.path.basename(srt_en_path), _external=True)
+    webvtt_vi_final = url_for('subtitles_file', filename=os.path.basename(webvtt_vi_path), _external=True)
+    webvtt_en_final = url_for('subtitles_file', filename=os.path.basename(webvtt_en_path), _external=True)
+    
+    return {
+        'srt': [
+        {"src": srt_vi_final, "srcLang": 'vi', "label": 'Việt Nam'},
+        {"src": srt_en_final, "srcLang": 'en', "label": 'English'}
+    ],
+        'vtt': [
+        {"src": webvtt_vi_final, "srcLang": 'vi', "label": 'Việt Nam'},
+        {"src": webvtt_en_final, "srcLang": 'en', "label": 'English'}
+    ]
+    }
     
