@@ -45,23 +45,57 @@ def convert_srt_to_webvtt(srt_file_path, webvtt_file_path):
         for line in srt_content:
             webvtt_file.write(line.replace(',', '.'))
 
-def create_srt_file(transcript, srt_file_path):
+def create_srt_file(transcript, srt_file_path, max_pause_duration = 2.0, words_per_subtitle = 5):
     subs = []
-    words = transcript.results[0].alternatives[0].words
-    word_count = len(words)
-    words_per_subtitle = 5
+    results = transcript.results
 
-    for i in range(0, word_count, words_per_subtitle):
-        subtitle_text = ' '.join(word.word for word in words[i:i + words_per_subtitle])
-        
-        start_time = words[i].start_time
-        end_time = words[min(i + words_per_subtitle - 1, word_count - 1)].end_time
-        
-        start_time_seconds = start_time.total_seconds()
-        end_time_seconds = end_time.total_seconds()
-        
-        subs.append(srt.Subtitle(index=len(subs) + 1, start=timedelta(seconds=start_time_seconds), end=timedelta(seconds=end_time_seconds), content=subtitle_text))
+    for result in results:
+        alternatives = result.alternatives
+        for alternative in alternatives:
+            words = alternative.words
+            word_count = len(words)
 
+            i = 0
+            while i < word_count:
+                subtitle_text = ''
+                start_time = words[i].start_time
+                end_time = start_time
+                current_speaker = getattr(words[i], 'speaker_tag', None)
+                subtitle_words = []
+
+                for j in range(i, word_count):
+                    word = words[j]
+
+                    # Handle speaker change
+                    if current_speaker is not None and getattr(word, 'speaker_tag', None) != current_speaker and subtitle_words:
+                        break
+
+                    # Handle pauses
+                    if j > i and (word.start_time.total_seconds() - end_time.total_seconds() > max_pause_duration):
+                        break
+
+                    subtitle_words.append(word.word)
+                    end_time = word.end_time
+
+                    # Check if subtitle length is reached
+                    if len(subtitle_words) >= words_per_subtitle:
+                        break
+
+                subtitle_text = ' '.join(subtitle_words)
+                start_time_seconds = start_time.total_seconds()
+                end_time_seconds = end_time.total_seconds()
+
+                # Append subtitle
+                subs.append(srt.Subtitle(
+                    index=len(subs) + 1,
+                    start=timedelta(seconds=start_time_seconds),
+                    end=timedelta(seconds=end_time_seconds),
+                    content=subtitle_text.strip()
+                ))
+
+                i = j + 1
+
+    # Write subtitles to file
     with open(srt_file_path, "w", encoding="utf-8") as srt_file:
         srt_file.write(srt.compose(subs))
 
