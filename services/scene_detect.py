@@ -18,7 +18,6 @@ def write_video(frames, output_video, fps):
 def detect_scenes_pyscenedetect(video_path, output_path, image_folder, project_id):
     video_clip = VideoFileClip(video_path)
 
-    audio = video_clip.audio
     fps = video_clip.fps
     
     video_manager = VideoManager([video_path])
@@ -33,13 +32,13 @@ def detect_scenes_pyscenedetect(video_path, output_path, image_folder, project_i
     # image_urls = []
     
     if not scene_list:
-        frames = crop_video_to_center(video_clip, fps, image_folder, project_id)
+        frames, urls = crop_video_to_center(video_clip, fps, image_folder, project_id)
         all_frames.extend(frames)
         # image_urls.extend(urls)
     else:
         for i, (start_frame, end_frame) in enumerate(scene_list):
             subclip = video_clip.subclip(start_frame.get_seconds(), end_frame.get_seconds())
-            frames = crop_video_to_center(subclip, fps, image_folder, project_id)
+            frames, urls = crop_video_to_center(subclip, fps, image_folder, project_id)
             all_frames.extend(frames)
             # image_urls.extend(urls)
         

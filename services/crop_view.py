@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from flask import Flask
+from flask import Flask, url_for
 import json
 from ultralytics import YOLO
 from scipy.optimize import curve_fit
@@ -76,11 +76,11 @@ def crop_video_to_center(subclip, fps, image_folder, project_id):
         center_x = compute_scene_center_x(frame)
         center_x_values.append(center_x)
         
-        # image_filename = f"frame_{project_id}_{int(t)}.jpg"
-        # image_path = os.path.join(image_folder, image_filename)
-        # cv2.imwrite(image_path, frame)
-        # image_url = url_for('uploaded_image', timestamp=project_id, filename=image_filename, _external=True)
-        # image_urls.append(image_url)
+        image_filename = f"frame_{project_id}_{int(t)}.jpg"
+        image_path = os.path.join(image_folder, image_filename)
+        cv2.imwrite(image_path, frame) 
+        image_url = url_for('uploaded_image', timestamp=project_id, filename=image_filename, _external=True)
+        image_urls.append(image_url)
         
     if len(center_x_values) >= 3:
         smoothed_center_x_values = smooth_center_x_values(center_x_values)
@@ -124,5 +124,4 @@ def crop_video_to_center(subclip, fps, image_folder, project_id):
     
     cap.release()
     os.remove(temp_video_path)
-    # return frames, image_urls
-    return frames
+    return frames, image_urls

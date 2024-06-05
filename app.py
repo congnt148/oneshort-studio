@@ -85,5 +85,9 @@ def finaled_file(filename):
 def subtitles_file(filename):
     return send_file(os.path.join(app.config['SUBTITLE_FOLDER'], filename), as_attachment=True)
 
+@app.route('/data/images/<filename>', methods=['GET', 'OPTIONS'])
+def images_file(filename):
+    return send_file(os.path.join(app.config['IMAGE_FOLDER'], filename), as_attachment=True)
+
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=5000)
