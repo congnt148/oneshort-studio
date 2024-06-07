@@ -157,7 +157,7 @@ def crop_video(input_path, output_path):
     srt_translate_file_path = "subtitles_translate.srt"
     create_srt_file(transcript, srt_file_path)
     translate_srt_file(srt_file_path, srt_translate_file_path)
-    add_subtitles_to_video(temp_video_path, srt_file_path, srt_translate_file_path, output_path, audio_path)
+    # add_subtitles_to_video(temp_video_path, srt_file_path, srt_translate_file_path, output_path, audio_path)
    
     os.remove(audio_path)
     os.remove(temp_video_path)
