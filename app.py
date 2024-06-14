@@ -6,7 +6,7 @@ from services.scene_detect import detect_scenes_pyscenedetect
 from services.subtitle import get_subtitle
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://localhost:3001"}})
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 ROOT_FOLDER = 'data'
 UPLOAD_FOLDER = os.path.join(ROOT_FOLDER, 'uploads')
@@ -51,11 +51,11 @@ def crop_video_api():
     
     output_filename = f"cropped_{project_id}.mp4"
     output_video_path = os.path.join(app.config['FINAL_FOLDER'], output_filename)
-    image_folder = os.path.join(app.config['IMAGE_FOLDER'], project_id)
-    os.makedirs(image_folder, exist_ok=True)
+    # image_folder = os.path.join(app.config['IMAGE_FOLDER'], project_id)
+    # os.makedirs(image_folder, exist_ok=True)
     
     try:
-        detect_scenes_pyscenedetect(input_video_path, output_video_path, image_folder, project_id)
+        detect_scenes_pyscenedetect(input_video_path, output_video_path, project_id)
         subs = get_subtitle(input_video_path, project_id, app.config['SUBTITLE_FOLDER'])
         
     except Exception as e:
@@ -81,11 +81,11 @@ def uploaded_file(filename):
 def finaled_file(filename):
     return send_file(os.path.join(app.config['FINAL_FOLDER'], filename), as_attachment=True)
 
-@app.route('/data/subtitles/<filename>', methods=['GET', 'OPTIONS'])
+@app.route('/data/subtitles/<filename>')
 def subtitles_file(filename):
     return send_file(os.path.join(app.config['SUBTITLE_FOLDER'], filename), as_attachment=True)
 
-@app.route('/data/images/<filename>', methods=['GET', 'OPTIONS'])
+@app.route('/data/images/<filename>')
 def images_file(filename):
     return send_file(os.path.join(app.config['IMAGE_FOLDER'], filename), as_attachment=True)
 

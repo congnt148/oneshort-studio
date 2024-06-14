@@ -16,7 +16,7 @@ def write_video(frames, output_video, fps):
         
     out.release()
 
-def detect_scenes_pyscenedetect(video_path, output_path, image_folder, project_id):
+def detect_scenes_pyscenedetect(video_path, output_path, project_id):
     video_clip = VideoFileClip(video_path)
 
     fps = video_clip.fps
@@ -39,17 +39,7 @@ def detect_scenes_pyscenedetect(video_path, output_path, image_folder, project_i
             subclip = video_clip.subclip(start_frame.get_seconds(), end_frame.get_seconds())
             frames = crop_video_to_center(subclip, fps, project_id)
             all_frames.extend(frames)
-        # def process_scene(scene):
-        #     start_frame, end_frame = scene
-        #     subclip = video_clip.subclip(start_frame.get_seconds(), end_frame.get_seconds())
-        #     return crop_video_to_center(subclip, fps, project_id)
-
-        # with ThreadPoolExecutor() as executor:
-        #     frames_list = list(executor.map(process_scene, scene_list))
-        
-        # for frames in frames_list:
-        #     all_frames.extend(frames)
-        
+            
     temp_video_path = 'temp_video.mp4'
     write_video(all_frames, temp_video_path, fps)
     video_clip.close()

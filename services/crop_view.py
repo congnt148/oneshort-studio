@@ -17,19 +17,19 @@ object_weights_file_path = 'assets/object_weights.json'
 object_weights = load_object_weights(object_weights_file_path)
 
 
-def poly_fit(x, a, b, c):
-    return a * x ** 2 + b * x + c
+# def poly_fit(x, a, b, c):
+#     return a * x ** 2 + b * x + c
 
-def smooth_center_x_values(center_x_values):
+# def smooth_center_x_values(center_x_values):
     
-    if len(center_x_values) < 3:
-        return center_x_values 
+#     if len(center_x_values) < 3:
+#         return center_x_values 
     
-    x = np.arange(len(center_x_values))
-    y = np.array(center_x_values)
-    popt, _ = curve_fit(poly_fit, x, y)
-    smoothed_values = poly_fit(x, *popt)
-    return smoothed_values
+#     x = np.arange(len(center_x_values))
+#     y = np.array(center_x_values)
+#     popt, _ = curve_fit(poly_fit, x, y)
+#     smoothed_values = poly_fit(x, *popt)
+#     return smoothed_values
 
 def detect_objects(frame, confidence_threshold=0.6):
     results = model(frame)
@@ -68,7 +68,6 @@ def compute_scene_center_x(frame):
 
 def crop_video_to_center(subclip, fps, project_id):
     center_x_values = []
-    image_urls = []
     duration = subclip.duration
     
     for t in np.arange(0, duration, 1):
@@ -105,4 +104,4 @@ def crop_video_to_center(subclip, fps, project_id):
     
     cap.release()
     os.remove(temp_video_path)
-    return frames, image_urls
+    return frames
