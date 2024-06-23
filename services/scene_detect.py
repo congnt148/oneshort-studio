@@ -5,6 +5,7 @@ from scenedetect.detectors import ContentDetector
 import cv2
 from services.audio import add_audio_to_video
 from services.crop_view import crop_video_to_center
+from concurrent.futures import ThreadPoolExecutor
 
 def write_video(frames, output_video, fps):
     height, width, _ = frames[0].shape
@@ -15,7 +16,7 @@ def write_video(frames, output_video, fps):
         
     out.release()
 
-def detect_scenes_pyscenedetect(video_path, output_path, image_folder, project_id):
+def detect_scenes_pyscenedetect(video_path, output_path, project_id):
     video_clip = VideoFileClip(video_path)
 
     fps = video_clip.fps
@@ -29,19 +30,16 @@ def detect_scenes_pyscenedetect(video_path, output_path, image_folder, project_i
     
     scene_list = scene_manager.get_scene_list()
     all_frames = []
-    # image_urls = []
     
     if not scene_list:
-        frames, urls = crop_video_to_center(video_clip, fps, image_folder, project_id)
+        frames = crop_video_to_center(video_clip, fps, project_id)
         all_frames.extend(frames)
-        # image_urls.extend(urls)
     else:
         for i, (start_frame, end_frame) in enumerate(scene_list):
             subclip = video_clip.subclip(start_frame.get_seconds(), end_frame.get_seconds())
-            frames, urls = crop_video_to_center(subclip, fps, image_folder, project_id)
+            frames = crop_video_to_center(subclip, fps, project_id)
             all_frames.extend(frames)
-            # image_urls.extend(urls)
-        
+            
     temp_video_path = 'temp_video.mp4'
     write_video(all_frames, temp_video_path, fps)
     video_clip.close()
